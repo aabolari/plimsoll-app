@@ -42,6 +42,7 @@ import {
   type Origin,
   type ReportView,
 } from "@/lib/data";
+import { logger } from "@/lib/logger";
 
 export default function AssetPage() {
   return (
@@ -74,7 +75,7 @@ function AssetDetail() {
         // precondition for them, so a failed lookup leaves the page as it is.
         loadReporterNames(addresses)
           .then(setNames)
-          .catch((e: unknown) => console.warn("Could not load reporter names", e));
+          .catch((e: unknown) => logger.warn("Could not load reporter names", e));
       })
       .catch((e: unknown) => setError(e instanceof Error ? e.message : String(e)));
   }, [sac]);

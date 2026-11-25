@@ -9,6 +9,7 @@ import {
   type IndexerToml,
 } from "@plimsoll/sdk";
 import { config } from "./config";
+import { logger } from "./logger";
 
 /**
  * How a figure reached us. Not the same as AssetView.source, which says which
@@ -177,7 +178,7 @@ export async function loadAssets(): Promise<AssetView[]> {
       // is listed on-chain; fall through to the contracts.
       if (listed.length > 0) return listed.map(fromIndexer);
     } catch (err) {
-      console.warn("Indexer unavailable, reading from chain", err);
+      logger.warn("Indexer unavailable, reading from chain", err);
     }
   }
   const all = await Promise.all(
@@ -191,7 +192,7 @@ export async function loadAsset(sac: string): Promise<AssetView | null> {
     try {
       return fromIndexer(await indexer.getAsset(sac));
     } catch (err) {
-      console.warn("Indexer unavailable, reading from chain", err);
+      logger.warn("Indexer unavailable, reading from chain", err);
     }
   }
   return loadFromChain(sac);
@@ -223,7 +224,7 @@ export async function loadReporterNames(
         for (const r of all) nameCache.set(r.address, r.name);
         for (const a of missing) if (!nameCache.has(a)) nameCache.set(a, null);
       } catch (err) {
-        console.warn("Indexer unavailable, reading reporter names from chain", err);
+        logger.warn("Indexer unavailable, reading reporter names from chain", err);
       }
     }
     const stillMissing = missing.filter((a) => !nameCache.has(a));
@@ -234,7 +235,7 @@ export async function loadReporterNames(
           nameCache.set(a, info?.name ?? null);
         } catch (err) {
           // Leave it uncached: a failed read is not evidence of no name.
-          console.warn(`Could not read the registry name for ${a}`, err);
+          logger.warn(`Could not read the registry name for ${a}`, err);
         }
       }),
     );
